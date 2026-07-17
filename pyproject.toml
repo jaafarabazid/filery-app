@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+# PyPI's "filery" is taken; the distribution is "filery-app" while the app,
+# import package and repo are all "filery".
+name = "filery-app"
+version = "0.9.0"
+description = "Optimize and compress files for the web. First module: PDF."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later"
+authors = [{ name = "Jaafar Abazid" }]
+keywords = ["pdf", "optimization", "compression", "images", "media", "web"]
+
+dependencies = [
+    "pymupdf>=1.24",   # AGPL-3.0 - image decode/encode + PDF rebuild
+    "pikepdf>=8",      # MPL-2.0  - linearization (MuPDF dropped it)
+    "pillow>=10",      # HPND (permissive)
+    "numpy>=1.24",     # BSD-3
+]
+
+[project.optional-dependencies]
+gui = ["PySide6-Essentials>=6.6"]   # LGPL-3.0
+build = ["pyinstaller>=6.6"]
+dev = ["scikit-image", "pytest"]    # scikit-image: quality validation only, not shipped
+
+[project.scripts]
+filery = "filery.cli:main"
+
+[project.gui-scripts]
+filery-gui = "filery.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
