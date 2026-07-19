@@ -44,6 +44,19 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Version goes into every artifact filename so downloads never collide in a
+      # user's Downloads folder. Tags -> the tag (v0.9.3 -> 0.9.3); other builds
+      # get a dev-<sha> label so they can't be mistaken for a release.
+      - name: Resolve version
+        id: ver
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=0.0.0-dev.${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install
         run: |
           python -m pip install --upgrade pip
@@ -58,17 +71,29 @@ jobs:
 
       - name: Package (macOS -> .dmg)
         if: runner.os == 'macOS'
-        run: ./packaging/make_dmg.sh "Filery-${{ matrix.name }}.dmg"
+        run: ./packaging/make_dmg.sh "Filery-${{ steps.ver.outputs.version }}-macOS-arm64.dmg"
 
-      - name: Package (Windows -> .zip)
+      - name: Package (Windows -> Setup.exe)
         if: runner.os == 'Windows'
-        run: Compress-Archive -Path "packaging/dist/Filery/*" -DestinationPath "Filery-${{ matrix.name }}.zip"
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          $out = (Get-Location).Path
+          & $iscc "/DMyAppVersion=${{ steps.ver.outputs.version }}" "/O$out" "packaging\filery.iss"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+
+      - name: Package (Windows -> portable .zip)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path "packaging/dist/Filery/*" -DestinationPath "Filery-${{ steps.ver.outputs.version }}-Windows-x64-portable.zip"
 
       - uses: actions/upload-artifact@v6
         with:
           name: Filery-${{ matrix.name }}
           path: |
             *.dmg
+            *.exe
             *.zip
 
       - name: Release
@@ -77,4 +102,5 @@ jobs:
         with:
           files: |
             *.dmg
+            *.exe
             *.zip
