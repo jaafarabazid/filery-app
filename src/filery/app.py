@@ -107,6 +107,24 @@ class Worker(QObject):
             self.failed.emit(str(e))
 
 
+class AnalyzeWorker(QObject):
+    """Inspects a PDF off the UI thread. analyze() reads every image stream, which
+    is slow on large files, so it must not block the window."""
+
+    done = Signal(object)    # info dict
+    failed = Signal(str)
+
+    def __init__(self, path: str):
+        super().__init__()
+        self._path = path
+
+    def run(self) -> None:
+        try:
+            self.done.emit(analyze(self._path))
+        except Exception as e:  # noqa: BLE001 - surfaced to the user verbatim
+            self.failed.emit(str(e))
+
+
 class TitleBar(QFrame):
     """Custom chrome: frameless windows lose the native bar, so we draw our own,
     including a drag region and functional window buttons."""
@@ -393,6 +411,8 @@ class Window(QWidget):
         self.selected_key = "balanced"
         self.thread: QThread | None = None
         self.worker: Worker | None = None
+        self.analyze_thread: QThread | None = None
+        self.analyze_worker: AnalyzeWorker | None = None
 
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -511,19 +531,60 @@ class Window(QWidget):
         return w
 
     def load(self, path: str):
-        try:
-            info = analyze(path)
-        except Exception as e:  # noqa: BLE001
-            QMessageBox.critical(self, APP_NAME, f"Couldn't read that PDF.\n\n{e}")
+        if self.analyze_thread or self.thread:   # already busy
             return
+        self.src = path
+        # show the file immediately in a "reading" state so the click feels instant
+        self.drop.show_file(os.path.basename(path), "Analyzing…")
+        self.drop.setEnabled(False)
+        self.chips_host.setVisible(False)
+        for card in self.cards.values():
+            card.set_estimate("", "")
+        self.go.setEnabled(False)
+        self.status.setProperty("kind", "")
+        self.status.style().unpolish(self.status)
+        self.status.style().polish(self.status)
+        self.status.setText("Reading the PDF…")
+        self.bar.setRange(0, 0)      # indeterminate: analyze() has no page count to report
+        self.bar.setVisible(True)
+
+        self.analyze_thread = QThread(self)
+        self.analyze_worker = AnalyzeWorker(path)
+        self.analyze_worker.moveToThread(self.analyze_thread)
+        self.analyze_thread.started.connect(self.analyze_worker.run)
+        self.analyze_worker.done.connect(self._on_analyzed)
+        self.analyze_worker.failed.connect(self._on_analyze_failed)
+        self.analyze_thread.start()
+
+    def _end_analyze(self):
+        if self.analyze_thread:
+            self.analyze_thread.quit()
+            self.analyze_thread.wait()
+            self.analyze_thread = None
+        self.analyze_worker = None
+        self.bar.setVisible(False)
+        self.bar.setRange(0, 100)
+        self.drop.setEnabled(True)
+
+    def _on_analyze_failed(self, err: str):
+        self._end_analyze()
+        self.src = None
+        self.drop._build_empty()
+        self.status.setText("")
+        QMessageBox.critical(self, APP_NAME, f"Couldn't read that PDF.\n\n{err}")
+
+    def _on_analyzed(self, info: dict):
+        self._end_analyze()
         if info["encrypted"]:
+            self.src = None
+            self.drop._build_empty()
+            self.status.setText("")
             QMessageBox.warning(self, APP_NAME,
                                 "This PDF is encrypted. Decrypt it first, then try again.")
             return
-        self.src = path
         self.info = info
         self.drop.show_file(
-            os.path.basename(path),
+            os.path.basename(self.src),
             f"{info['pages']} pages  ·  {human(info['size'])}  ·  ready",
         )
 
