@@ -14,3 +14,6 @@ samples/*.pdf
 packaging/icon.png
 packaging/icon.ico
 packaging/icon.icns
+
+# generated macOS fallback png
+packaging/icon-macos.png

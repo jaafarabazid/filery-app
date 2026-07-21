@@ -70,7 +70,7 @@ if sys.platform == "darwin":
         icon=ICON,
         bundle_identifier="io.mantek.filery",
         info_plist={
-            "CFBundleShortVersionString": "0.9.3",
+            "CFBundleShortVersionString": "0.9.4",
             "NSHighResolutionCapable": True,
             "LSMinimumSystemVersion": "11.0",
             # let users drag a PDF onto the dock icon
