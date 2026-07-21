@@ -1,6 +1,10 @@
-# Filery
+<p align="center">
+  <img src="docs/icon.png" width="128" alt="Filery icon">
+</p>
 
-**Optimize and compress your files for the web.**
+<h1 align="center">Filery</h1>
+
+<p align="center"><b>Optimize and compress your files for the web.</b></p>
 
 Filery shrinks bloated files down to web-friendly sizes without wrecking their
 quality. The first module handles **PDFs** (typically **~90% smaller**), with images,
