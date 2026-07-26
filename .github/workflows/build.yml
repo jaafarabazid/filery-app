@@ -88,9 +88,16 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path "packaging/dist/Filery/*" -DestinationPath "Filery-${{ steps.ver.outputs.version }}-Windows-x64-portable.zip"
 
+      # Dev builds only. On a tag the Release step below attaches these same
+      # files permanently, so uploading an artifact too just stores a second
+      # copy against the Actions storage quota (release assets are not billed
+      # against it; artifacts are). Nothing downstream consumes this artifact:
+      # Release reads the files straight off the runner, not from here.
       - uses: actions/upload-artifact@v6
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           name: Filery-${{ matrix.name }}
+          retention-days: 7
           path: |
             *.dmg
             *.exe
