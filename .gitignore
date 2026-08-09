@@ -17,3 +17,6 @@ packaging/icon.icns
 
 # generated macOS fallback png
 packaging/icon-macos.png
+
+# wrangler local state
+.wrangler/
