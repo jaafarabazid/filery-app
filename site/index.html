@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filery, optimize and compress your files for the web</title>
+<meta name="description" content="Filery shrinks print-ready PDFs to web size, typically around 90 percent smaller, without touching text, fonts or layout. Free and open source for macOS and Windows.">
+<link rel="icon" href="favicon.ico">
+<meta property="og:title" content="Filery">
+<meta property="og:description" content="Your files bakery. Optimize and compress your files for the web.">
+<meta property="og:image" content="https://filery.app/icon.png">
+<meta property="og:url" content="https://filery.app/">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root{
+    --bg:#14161A; --panel:#1B1D21; --elev:#25272C;
+    --fg:#EBEBF0; --t2:#A6A8AF; --t3:#83858C; --t4:#63656C;
+    --line:#2A2C31; --line2:#3C3F45;
+    --light:#E6E6EC; --amber:#F59F0E; --purple:#7B4BC9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--fg);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px}
+
+  header{text-align:center;padding:72px 0 8px}
+  header img.icon{width:112px;height:112px;border-radius:24px}
+  .kicker{
+    color:var(--t3);font-size:11px;font-weight:700;letter-spacing:2.4px;
+    text-transform:uppercase;margin-top:22px
+  }
+  h1{font-size:clamp(34px,6vw,52px);font-weight:800;letter-spacing:-1px;margin-top:8px}
+  .sub{color:var(--t2);font-size:clamp(16px,2.4vw,19px);margin:14px auto 0;max-width:620px}
+
+  .stat{
+    margin:40px auto 0;max-width:560px;background:var(--panel);
+    border:1px solid var(--line);border-radius:14px;padding:22px 20px
+  }
+  .stat .row{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap}
+  .stat .before{color:var(--t3);font-size:26px;font-weight:700;text-decoration:line-through}
+  .stat .arrow{color:var(--t4);font-size:20px}
+  .stat .after{color:var(--fg);font-size:32px;font-weight:800}
+  .stat .pill{
+    background:var(--elev);border:1px solid var(--line2);border-radius:999px;
+    padding:5px 13px;font-size:13px;font-weight:700;color:var(--amber)
+  }
+  .stat .cap{color:var(--t3);font-size:13px;margin-top:12px}
+
+  .dl{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:34px 0 10px}
+  .btn{
+    display:inline-flex;flex-direction:column;align-items:center;gap:2px;
+    background:var(--light);color:#14161A;border-radius:11px;
+    padding:13px 26px;text-decoration:none;font-weight:700;font-size:15px;
+    border:none;transition:background .15s ease
+  }
+  .btn:hover{background:#F4F4F8}
+  .btn small{font-weight:500;font-size:11.5px;opacity:.62}
+  .btn.alt{background:transparent;color:var(--t2);border:1px solid var(--line2)}
+  .btn.alt:hover{border-color:#55585F;color:var(--fg)}
+  .ver{text-align:center;color:var(--t4);font-size:12.5px;margin-top:6px}
+
+  .note{
+    max-width:600px;margin:26px auto 0;background:var(--panel);
+    border:1px solid var(--line);border-left:3px solid var(--amber);
+    border-radius:9px;padding:14px 16px;color:var(--t2);font-size:13.5px
+  }
+  .note b{color:var(--fg)}
+
+  section{padding:64px 0}
+  h2{font-size:24px;font-weight:750;letter-spacing:-.4px;text-align:center}
+  .lede{color:var(--t2);text-align:center;max-width:640px;margin:12px auto 0;font-size:15px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:34px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+  .card h3{font-size:15px;font-weight:700;margin-bottom:7px}
+  .card p{color:var(--t2);font-size:14px}
+
+  .shot{margin-top:34px;text-align:center}
+  .shot img{max-width:100%;border-radius:14px;border:1px solid var(--line)}
+
+  .keeps{max-width:620px;margin:28px auto 0;list-style:none}
+  .keeps li{color:var(--t2);font-size:14.5px;padding:9px 0 9px 28px;position:relative;border-bottom:1px solid var(--line)}
+  .keeps li:last-child{border-bottom:none}
+  .keeps li:before{content:"";position:absolute;left:6px;top:16px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+  .keeps b{color:var(--fg)}
+
+  footer{border-top:1px solid var(--line);padding:34px 0 56px;text-align:center;color:var(--t4);font-size:13px}
+  footer a{color:var(--t2);text-decoration:none;border-bottom:1px solid var(--line2)}
+  footer a:hover{color:var(--fg)}
+  .foot-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <img class="icon" src="icon.png" alt="Filery">
+    <div class="kicker">Your files bakery</div>
+    <h1>Optimize for the web</h1>
+    <p class="sub">Filery shrinks bloated files down to web size without wrecking their quality. Text, fonts and layout are never touched.</p>
+
+    <div class="stat">
+      <div class="row">
+        <span class="before">79.9 MB</span>
+        <span class="arrow">&rsaquo;</span>
+        <span class="after">7.1 MB</span>
+        <span class="pill">91% smaller</span>
+      </div>
+      <div class="cap">A real 28 page print supplement. No visible difference at reading zoom.</div>
+    </div>
+
+    <div class="dl">
+      <a class="btn" id="dl-mac" href="https://github.com/jaafarabazid/filery-app/releases/latest">
+        Download for macOS <small>Apple Silicon</small>
+      </a>
+      <a class="btn" id="dl-win" href="https://github.com/jaafarabazid/filery-app/releases/latest">
+        Download for Windows <small>64 bit installer</small>
+      </a>
+      <a class="btn alt" id="dl-zip" href="https://github.com/jaafarabazid/filery-app/releases/latest">
+        Portable ZIP <small>no install</small>
+      </a>
+    </div>
+    <div class="ver" id="ver">Free and open source</div>
+
+    <div class="note">
+      <b>First launch:</b> these builds are not code signed yet, so macOS says it cannot verify the developer and Windows shows a SmartScreen prompt. On macOS open <b>System Settings, Privacy &amp; Security</b> and choose <b>Open Anyway</b>. On Windows click <b>More info</b> then <b>Run anyway</b>.
+    </div>
+  </header>
+
+  <section>
+    <h2>Why print PDFs are so big</h2>
+    <p class="lede">Almost never the text. On that 28 page file, 95 percent of the bytes were images, every one of them CMYK at 300 to 411 ppi. Correct for a printing press, pure waste on a web page.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>CMYK to sRGB</h3>
+        <p>Drops a whole colour channel and makes colour render consistently across browsers instead of leaving each viewer to interpret it.</p>
+      </div>
+      <div class="card">
+        <h3>Resampled to real placement</h3>
+        <p>Filery measures where each image actually lands on the page, not what its metadata claims. Nothing is ever upscaled.</p>
+      </div>
+      <div class="card">
+        <h3>A codec per image</h3>
+        <p>Photographs get JPEG. Line art, logos and charts stay lossless, because JPEG rings around hard edges.</p>
+      </div>
+      <div class="card">
+        <h3>Fast Web View</h3>
+        <p>Output is linearized, so pages start rendering while the file is still downloading. Metadata and unused objects are stripped.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it never touches</h2>
+    <ul class="keeps">
+      <li><b>Text.</b> Never rasterized, never re-encoded. Fonts stay embedded exactly as they were.</li>
+      <li><b>Layout.</b> Page size, order, margins, links, bookmarks and annotations all survive.</li>
+      <li><b>Vectors.</b> They stay vectors. Nothing is flattened into an image.</li>
+      <li><b>Your original.</b> Filery writes a new file and leaves the source alone.</li>
+    </ul>
+    <div class="shot"><img src="screenshot.png" alt="The Filery app window"></div>
+  </section>
+
+  <section>
+    <h2>Three levels, one click</h2>
+    <p class="lede">Drop a file in, pick how hard to squeeze, and Filery shows the predicted size before you commit. Balanced is the default.</p>
+    <div class="grid">
+      <div class="card"><h3>High Quality</h3><p>200 ppi. Around 82 percent smaller. For pages that will be zoomed or printed casually.</p></div>
+      <div class="card"><h3>Balanced</h3><p>150 ppi. Around 91 percent smaller. Retina sharp at full page zoom. The recommended default.</p></div>
+      <div class="card"><h3>Maximum</h3><p>110 ppi. Around 94 percent smaller. The smallest practical size that stays comfortably readable.</p></div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-links">
+      <a href="https://github.com/jaafarabazid/filery-app">Source on GitHub</a>
+      <a href="https://github.com/jaafarabazid/filery-app/releases">All releases</a>
+      <a href="https://github.com/jaafarabazid/filery-app/issues">Report an issue</a>
+    </div>
+    Free and open source under the AGPL 3.0. PDFs today, images and video next.
+  </div>
+</footer>
+
+<script>
+// Progressive enhancement: the buttons already point at the releases page, which
+// always works. If the API answers, upgrade them to direct asset links and show
+// the version. Any failure leaves the working fallback in place.
+(function () {
+  var API = "https://api.github.com/repos/jaafarabazid/filery-app/releases/latest";
+  fetch(API, { headers: { Accept: "application/vnd.github+json" } })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function (rel) {
+      var pick = function (test) {
+        return (rel.assets || []).filter(function (a) { return test(a.name); })[0];
+      };
+      var mac = pick(function (n) { return /\.dmg$/i.test(n); });
+      var win = pick(function (n) { return /Setup\.exe$/i.test(n); });
+      var zip = pick(function (n) { return /portable\.zip$/i.test(n); });
+      var set = function (id, asset) {
+        if (asset) document.getElementById(id).href = asset.browser_download_url;
+      };
+      set("dl-mac", mac); set("dl-win", win); set("dl-zip", zip);
+      if (rel.tag_name) {
+        document.getElementById("ver").textContent =
+          rel.tag_name + "  ·  free and open source";
+      }
+    })
+    .catch(function () { /* keep the releases-page fallback */ });
+})();
+</script>
+</body>
+</html>
