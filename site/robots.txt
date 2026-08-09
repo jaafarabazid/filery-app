@@ -1,0 +1,9 @@
+# Filery, https://www.filery.app
+# Open policy, set deliberately 2026-08-09.
+# Search crawlers, AI answer engines and AI training crawlers are all welcome.
+# This is a free open source project; being found and being cited is the point.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.filery.app/sitemap.xml
