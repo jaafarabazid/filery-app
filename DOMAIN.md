@@ -1,9 +1,9 @@
 # Domain, DNS and launch checklist
 
 Everything about **filery.app** as an internet property: what is registered, what is
-configured, what was decided and why, and what still has to happen before launch.
+configured, what was decided and why, and what remains open.
 
-Written 2026-08-06, updated 2026-08-10 after launch. This lives in the repo
+Written 2026-08-06. Launched and substantially revised 2026-08-10. This lives in the repo
 deliberately, because it was worked out in a session on a different project and would
 otherwise not travel.
 
@@ -139,11 +139,6 @@ that `http://filery.app` takes two hops (rule 1, then rule 2) while
 `http://www.filery.app` takes one. Not worth optimising, given preload means neither
 path is normally travelled.
 
-ℹ️ There is also an **HTTP to HTTPS** redirect rule, which is near-dead weight on this
-TLD since `.app` is HSTS-preloaded and browsers never send plaintext. Harmless.
-Cloudflare's **Always Use HTTPS** toggle (SSL/TLS, Edge Certificates) is the correct
-instrument for that anyway.
-
 ---
 
 ## Launch: done, and what is still open
@@ -152,48 +147,135 @@ instrument for that anyway.
 both hostnames resolve through Cloudflare, and the apex to www redirect is working.
 The mail hardening above survived the launch untouched, verified by `dig`.
 
-Still open:
+✅ **1. Redirect preserves path and query string.** Closed 2026-08-10. Checked beyond
+the homepage, because a broken wildcard replacement is invisible at the root:
 
-1. **Verify the live redirect preserves path and query string.** It has only been
-   checked at the root:
-   ```bash
-   curl -sI https://filery.app/some/path?a=1 | grep -i '^location:'
-   ```
-   Expect `https://www.filery.app/some/path?a=1`. A missing path or query string means
-   the wildcard replacement or the preserve-query-string checkbox is wrong, which is
-   invisible when you only test the homepage.
-2. **Set the AI crawler policy deliberately.** The zone still sits on Cloudflare's
-   default, "Block AI training bots: Do not block". mantek.io currently blocks AI
-   training while allowing search and answer bots, though that is itself under review.
-   Either way this should be a decision, not a default.
-3. 🔥 **The trademark is still uncleared**, and it still blocks a public `v1.0.0`. A
-   live site does not change that: a landing page is not a downloadable binary under
-   the name.
+| request to `filery.app` | `location:` |
+|---|---|
+| `/some/path?a=1` | `https://www.filery.app/some/path?a=1` |
+| `/a/b/c/deep?x=1&y=2` | `https://www.filery.app/a/b/c/deep?x=1&y=2` |
+| `/trailing/` | `https://www.filery.app/trailing/` |
+| `/?only=query` | `https://www.filery.app/?only=query` |
+
+Re-run after any edit to rule 2:
+
+```bash
+curl -sI https://filery.app/some/path?a=1 | grep -i '^location:'
+```
+
+✅ **2. Crawler policy decided 2026-08-09: fully open.** Search crawlers, AI answer
+engines and AI training crawlers are all allowed. Cloudflare was already on "Do not
+block", so no zone change was needed; what changed is that it is now a decision rather
+than an inherited default, and it is stated in `site/robots.txt` so the policy is
+legible and portable if the site ever leaves Cloudflare. Filery is free and open
+source, so discovery and citation are the point, and there is no content here with
+licensing value to protect.
+
+ℹ️ Keep three bot categories distinct, because the Cloudflare toggle does not:
+**search crawlers** (Googlebot, Bingbot) drive traffic; **AI answer engines**
+(OAI-SearchBot, PerplexityBot) fetch live and usually cite with a link, so they drive
+traffic too and should never be blocked; **AI training crawlers** (GPTBot, ClaudeBot,
+CCBot, Google-Extended) take content and return nothing. Only the third is a values
+call. mantek.io blocks that third group, which is under review separately.
+
+Still open: **the trademark position below**, and code signing (an Apple Developer ID
+at $99/year, plus a Windows Authenticode certificate). Until signing is bought, both
+builds warn on first launch and the landing page tells visitors how to get past it.
 
 ---
 
-## Still blocking a public v1.0.0
+## The name: searched 2026-08-09
 
-🔥 **The trademark has never been cleared.** It needs a human: every register and
-mirror blocks automated access, so it was never actually searched, and saying
-otherwise would dress an inference up as a search. It needs the USPTO check plus a UAE
-search.
+Superseding an earlier note here that said the mark had never been searched. It has
+been now. Run by hand in a browser, because every register blocks automated access
+exactly as this document warned: Justia returns 403, Trademarkia 403, the USPTO search
+API 404.
 
-**Do not tag a public v1.0.0 until that is done.** A public release with downloadable
-binaries is a hard, effectively permanent commitment to the name. Registering the
-domain first was deliberate and is not a contradiction: it is cheap, it stops someone
-else taking the name while the mark is checked, and it commits nothing publicly.
+### What the register says
+
+`FILERY` is a live US registration, and the class is the material fact:
+
+| field | value |
+|---|---|
+| Mark | FILERY, standard character |
+| Registration | 6294999, serial 90125595 |
+| Status | 700, Registered; class status Active |
+| Filed / registered | 2020-08-20 / 2021-03-16 |
+| Owner | Dongguan Hanluxin E-Commerce Co., Ltd (originally Jin Li) |
+| **Class** | **016, paper goods** |
+| Goods | easels, ballpoint pens, bathroom tissue, baby bibs, bookbinding tape, calendars and diaries, drawing boards, paper doilies, egg cartons, photocopy paper |
+
+**There is no `FILERY` registration in Class 9 (computer software) or Class 42
+(software as a service).** The software space is, on the US register, unoccupied.
+
+### The basis for proceeding
+
+**Filery ships as a free, open-source desktop utility.** Trademark rights attach to
+the goods and services a mark is registered for, and identical marks routinely coexist
+across unrelated classes. Class 016 covers physical stationery sold through consumer
+marketplaces; Filery is downloadable software distributed through GitHub and this
+domain. Different goods, different channels, different buyers.
+
+Recorded honestly, because a future reader deserves the whole picture: the mark is
+**identical rather than merely similar**, and Class 016 is office and filing supplies,
+which is conceptually adjacent to file management. That adjacency is the weakest point
+in the position, and it is why the conditions below matter.
+
+### What would warrant revisiting
+
+Two changes, either of which strengthens the other side materially:
+
+- **Distributing through an app store.** Store operators act conservatively on
+  trademark complaints and tend to remove first and adjudicate later.
+- **Charging for it.** "Free and open source" is a genuine mitigating factor but not
+  an exemption: liability turns on use in commerce and likelihood of confusion, not on
+  revenue.
+
+If either becomes likely, **file `FILERY` in Class 9 first**, roughly $250 to $350 per
+class at the USPTO. The examiner may or may not cite the Class 016 registration.
+
+ℹ️ **Worth re-checking cheaply:** a US registration requires a Section 8 declaration of
+continued use between the fifth and sixth anniversary. For this registration that
+window opened **2026-03-16** and runs to 2027-03-16, with a grace period to September
+2027. If it is not filed, the registration cancels. Not something to rely on, but a
+one-minute lookup.
+
+ℹ️ **Only the US register was searched.** No UAE search has been done, which would
+matter if Filery is ever commercialised through the ManTek entity.
+
+⚠️ This is a record of what was found and decided, not legal advice. Nobody
+qualified has reviewed it.
+
+### Note on the earlier "do not ship binaries" rule
+
+This document previously said not to tag a public `v1.0.0` because downloadable
+binaries are a hard commitment to the name. **That threshold has already been
+crossed, deliberately.** The repository went public on 2026-08-09 with five tagged
+releases attached, `v0.9.0` through `v0.9.4`, and the landing page links straight to
+the macOS DMG and the Windows installer. That was decided with the Class 016 finding
+in hand, not by oversight. Version numbering is now an ordinary release decision.
 
 ---
 
 ## Verifying any of this
 
-⚠️ **The wrangler OAuth token cannot do this work.** Its scope is `zone (read)`, which
-covers zone metadata only. **`/dns_records` and `/rulesets` both return
-`Authentication error`**, and there is no write scope at all, so neither DNS records
-nor Rules can be read back or changed through it. Writing needs a purpose-made token
-(My Profile, API Tokens, "Edit zone DNS" template, Zone Resources restricted to
-filery.app), otherwise it is the dashboard by hand.
+⚠️ **The wrangler OAuth token cannot do the DNS or Rules work.** Corrected 2026-08-10:
+it is **not** read-only across the board, as this section previously claimed. Actual
+scopes include `pages (write)`, `workers (write)`, `d1 (write)` and `ssl_certs
+(write)`, alongside `zone (read)`. So `wrangler pages deploy` works and is how the
+site ships.
+
+What genuinely does not work, confirmed by probing:
+
+- The OAuth token is **rejected as a raw `Authorization: Bearer` header** on the REST
+  API. Even `GET /pages/projects/...` returns 401. It functions only through wrangler.
+- wrangler 4.106 has **no `pages domain` subcommand**, so a custom domain cannot be
+  attached from the CLI.
+- Attaching a custom domain writes a DNS record, and the token holds only
+  `zone (read)`. Blocked on permissions, not tooling.
+
+Writing needs a purpose-made token (My Profile, API Tokens, Zone:DNS:Edit on
+filery.app plus Account:Cloudflare Pages:Edit), otherwise it is the dashboard by hand.
 
 **`dig` works and is the better instrument anyway**, because it reads the artefact
 rather than the interface that claimed success:
@@ -215,3 +297,46 @@ dig +short TXT whatever-nobody-registered._domainkey.filery.app @chin.ns.cloudfl
 ```
 
 Existing and matching are different claims.
+
+---
+
+## Hosting, as actually deployed
+
+The site is a **Cloudflare Pages** project, direct-upload from `site/` in this repo.
+Production URL **https://filery.pages.dev**.
+
+⚠️ **The project is named `filery-website`, not `filery`.** It was created as `filery`
+and renamed in the dashboard to match `mantekio-website` and `nwcuaenet-website`.
+Deploying with the old name fails with a misleading **"Project not found"** while the
+site is plainly live. The command is:
+
+```bash
+wrangler pages deploy site --project-name=filery-website --branch=main
+```
+
+⚠️ **Pages serves `index.html` for unknown paths unless a `404.html` exists.** Before
+one was added, `/robots.txt` and `/sitemap.xml` each returned the homepage with a
+**200**, and every mistyped URL looked to a crawler like duplicate content. `site/`
+now holds a real `404.html`, `robots.txt` and `sitemap.xml`. Verify with:
+
+```bash
+curl -o /dev/null -w '%{http_code}\n' https://www.filery.app/no/such/page   # must be 404
+```
+
+⚠️ **A `dig` trap at the apex, which nearly caused a live outage.** `dig` shows A and
+AAAA records at `filery.app` and no CNAME, which reads like a stray placeholder record.
+It is not. That is Cloudflare **flattening the apex CNAME**, the correct and expected
+behaviour. Deleting those "A records" deletes the real apex CNAME and takes the site
+down. Read the DNS table in the dashboard before concluding anything from `dig` at an
+apex.
+
+ℹ️ **Why the apex hung on "Verifying".** A redirect rule was intercepting the apex and
+301ing it away before Pages could confirm the hostname routed to the project, so
+verification could never succeed. The fix: disable the rule, re-add the custom domain,
+let it go Active, then re-enable the rule.
+
+### Canonical metadata lives in the page too
+
+`site/index.html` carries `rel=canonical`, `og:url` and `og:image` pointing at
+**www**. If the canonical form is ever changed, change these with it or the page will
+contradict the redirect.
