@@ -18,11 +18,13 @@ travel. **If you rebase or reset this branch, check that `DOMAIN.md` is still on
 ## The domain
 
 **`filery.app`**, registered **2026-08-05** at Cloudflare Registrar.
-**$14.20/year, auto-renew on, expires 2027-08-06.** Registrant is ManTek
-Technologies at the Meydan address.
+**$14.20/year, auto-renew on, expires 2027-08-06.**
 
-Zone `a056037641f26779fbeda2c2d701500d`, account `a7de0c4d9210c176ccbf15b1a5248b48`.
 Authoritative nameservers **`chin.ns.cloudflare.com`** and `henrik.ns.cloudflare.com`.
+
+ℹ️ **Zone ID, account ID and registrant details are deliberately not recorded here**,
+because this file is public. Read them from the Cloudflare dashboard when a command
+needs them. Nothing in this document depends on knowing them.
 
 `filery.com` was never an option: registered 2007, parked with IONOS.
 
